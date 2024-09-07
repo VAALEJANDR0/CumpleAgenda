@@ -66,15 +66,17 @@ const AddContactScreen = ({ navigation }) => {
 
   // Función para agregar el contacto
   const handleAddContact = async () => {
-    if (!validateFields()) return;  // Si la validación falla, se detiene el proceso
-
+    if (!validateFields()) return;
+  
     const newContact = { name, surname, email, phone, birthday };
-    const contacts = await AsyncStorage.getItem('contacts');
+    const currentUser = await AsyncStorage.getItem('currentUser'); // Obtener el usuario actual
+    const contacts = await AsyncStorage.getItem(`contacts_${currentUser}`); // Obtener los contactos específicos de este usuario
     const contactsArray = contacts ? JSON.parse(contacts) : [];
     contactsArray.push(newContact);
-    await AsyncStorage.setItem('contacts', JSON.stringify(contactsArray));
+    await AsyncStorage.setItem(`contacts_${currentUser}`, JSON.stringify(contactsArray));
     navigation.navigate('Contactos');
   };
+  
 
   return (
     <View style={styles.container}>

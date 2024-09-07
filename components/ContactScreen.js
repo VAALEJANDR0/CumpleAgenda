@@ -15,12 +15,14 @@ const ContactScreen = ({ navigation }) => {
   useFocusEffect(
     React.useCallback(() => {
       const loadContacts = async () => {
-        const storedContacts = await AsyncStorage.getItem('contacts');
+        const currentUser = await AsyncStorage.getItem('currentUser'); // Obtener el usuario actual
+        const storedContacts = await AsyncStorage.getItem(`contacts_${currentUser}`); // Obtener los contactos específicos de este usuario
         setContacts(storedContacts ? JSON.parse(storedContacts) : []);
       };
       loadContacts();
     }, [])
   );
+  
 
   // Función para eliminar un contacto
   const handleDeleteContact = (index) => {

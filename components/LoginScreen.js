@@ -11,11 +11,10 @@ const handleLogin = async () => {
   try {
     const users = await AsyncStorage.getItem('users');
     const usersArray = users ? JSON.parse(users) : [];
-
     const user = usersArray.find(u => u.email === email && u.password === password);
 
     if (user) {
-      // Navegamos al Drawer en lugar de 'Contactos'
+      await AsyncStorage.setItem('currentUser', email); // Guardar el correo del usuario logueado
       navigation.navigate('Drawer');
     } else {
       Alert.alert('Error', 'Correo o contraseña incorrectos.');
@@ -24,6 +23,7 @@ const handleLogin = async () => {
     console.error(e);
   }
 };
+
 
   return (
     <View style={styles.container}>
