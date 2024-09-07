@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, Modal, Button } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FAB } from 'react-native-paper';
+import { MaterialIcons } from '@expo/vector-icons'; // Asegúrate de tener este paquete instalado
 import { useFocusEffect } from '@react-navigation/native';
 import moment from 'moment'; // para manejar las fechas
 
-// Asegúrate de que 'navigation' se pasa como prop
 const ContactScreen = ({ navigation }) => {
   const [contacts, setContacts] = useState([]);
   const [selectedContact, setSelectedContact] = useState(null); // Para almacenar el contacto seleccionado
@@ -22,7 +22,6 @@ const ContactScreen = ({ navigation }) => {
       loadContacts();
     }, [])
   );
-  
 
   // Función para eliminar un contacto
   const handleDeleteContact = (index) => {
@@ -35,11 +34,20 @@ const ContactScreen = ({ navigation }) => {
           text: "Eliminar",
           style: "destructive",
           onPress: async () => {
-            const updatedContacts = contacts.filter((_, i) => i !== index);
-            setContacts(updatedContacts);
-            await AsyncStorage.setItem('contacts', JSON.stringify(updatedContacts));
-          }
-        }
+            try {
+              const updatedContacts = contacts.filter((_, i) => i !== index);
+              setContacts(updatedContacts); // Actualiza el estado local
+
+              // Guardar los contactos actualizados en AsyncStorage para el usuario actual
+              const currentUser = await AsyncStorage.getItem('currentUser'); // Obtener el usuario actual
+              await AsyncStorage.setItem(`contacts_${currentUser}`, JSON.stringify(updatedContacts));
+
+              Alert.alert("Contacto eliminado", "El contacto ha sido eliminado correctamente.");
+            } catch (error) {
+              Alert.alert("Error", "Hubo un problema al eliminar el contacto.");
+            }
+          },
+        },
       ]
     );
   };
@@ -49,18 +57,15 @@ const ContactScreen = ({ navigation }) => {
     const today = moment();
     const birthDate = moment(birthday, 'DD/MM/YYYY').year(today.year()); // cumpleaños este año
 
-    // Si el cumpleaños ya pasó este año, devolvemos un valor negativo
     if (birthDate.isBefore(today, 'day')) {
       return birthDate.diff(today, 'days'); // diferencia negativa
     }
-
     return birthDate.diff(today, 'days'); // diferencia positiva o cero (cumpleaños hoy)
   };
 
   // Función para determinar el estilo de cada contacto según los días hasta el cumpleaños
   const getContactStyle = (birthday) => {
     const daysUntilBirthday = calculateDaysUntilBirthday(birthday);
-
     if (daysUntilBirthday === 0) {
       return styles.today; // Cumpleaños hoy (verde)
     } else if (daysUntilBirthday < 0) {
@@ -106,7 +111,10 @@ const ContactScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       {contacts.length === 0 ? (
-        <Text>No hay registros!! 😔</Text>
+        <View style={styles.emptyContainer}>
+          <MaterialIcons name="sentiment-dissatisfied" size={60} color="gray" />
+          <Text style={styles.emptyText}>No hay registros!!</Text>
+        </View>
       ) : (
         <FlatList
           data={contacts}
@@ -117,7 +125,7 @@ const ContactScreen = ({ navigation }) => {
       <FAB
         style={styles.fab}
         icon="plus"
-        onPress={() => navigation.navigate('Agregar Contacto')} // Asegúrate de que se recibe 'navigation'
+        onPress={() => navigation.navigate('Agregar Contacto')}
       />
 
       {/* Modal para mostrar los detalles del contacto */}
@@ -147,10 +155,22 @@ const ContactScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20 },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  emptyText: {
+    fontSize: 18,
+    color: 'gray',
+    marginTop: 10,
+    textAlign: 'center',
+  },
   contactItem: {
     padding: 15,
     marginVertical: 10,
-    borderRadius: 10,
+    borderRadius: 40,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
