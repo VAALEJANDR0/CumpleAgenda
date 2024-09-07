@@ -96,7 +96,7 @@ const ContactScreen = ({ navigation }) => {
         onLongPress={() => handleDeleteContact(index)} // Permitir eliminar con un "long press"
         style={[styles.contactItem, getContactStyle(item.birthday)]}
       >
-        <Text style={styles.contactText}>{item.name}</Text>
+        <Text style={styles.contactText}>{item.name} {item.surname}</Text>
         <Text style={styles.daysText}>
           {daysUntilBirthday === 0
             ? 'Hoy Cumpleaños'
