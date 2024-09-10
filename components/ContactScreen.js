@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, Modal, Button } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { FAB } from 'react-native-paper';
-import { MaterialIcons } from '@expo/vector-icons'; // Asegúrate de tener este paquete instalado
+import { MaterialIcons } from '@expo/vector-icons'; 
 import { useFocusEffect } from '@react-navigation/native';
 import moment from 'moment'; // para manejar las fechas
 
